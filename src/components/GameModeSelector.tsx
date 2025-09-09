@@ -3,7 +3,7 @@ import { Bot, Users, Palette, Volume2, VolumeX, Grid3X3, Eye } from 'lucide-reac
 import { GameSettings } from '../types/chess';
 
 interface GameModeSelectorProps {
-  settings: GameSettings;
+  settings: GameSettings & { timeLimit?: number; increment?: number };
   onSettingsChange: (settings: Partial<GameSettings>) => void;
   onStartGame: () => void;
   isVisible: boolean;
@@ -19,6 +19,14 @@ export default function GameModeSelector({
 }: GameModeSelectorProps) {
   
   if (!isVisible) return null;
+
+  const timeOptions = [
+    { label: '5 min', time: 5, inc: 0 },
+    { label: '10 min', time: 10, inc: 0 },
+    { label: '15 min', time: 15, inc: 0 },
+    { label: '20 min', time: 20, inc: 0 },
+    { label: '10 + 5', time: 10, inc: 5 } // 10 minutes + 5 sec increment
+  ];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -86,6 +94,22 @@ export default function GameModeSelector({
           </>
         )}
 
+        {/* Time Control */}
+        <div className="setting-section">
+          <h3>Time Control</h3>
+          <div className="time-options">
+            {timeOptions.map(opt => (
+              <button
+                key={opt.label}
+                className={settings.timeLimit === opt.time && settings.increment === opt.inc ? 'active' : ''}
+                onClick={() => onSettingsChange({ timeLimit: opt.time, increment: opt.inc })}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Display Settings */}
         <div className="setting-section">
           <h3>Display Options</h3>
@@ -134,12 +158,8 @@ export default function GameModeSelector({
 
         {/* Action Buttons */}
         <div className="modal-actions">
-          <button onClick={onClose} className="cancel-btn">
-            Cancel
-          </button>
-          <button onClick={onStartGame} className="start-btn">
-            Start Game
-          </button>
+          <button onClick={onClose} className="cancel-btn">Cancel</button>
+          <button onClick={onStartGame} className="start-btn">Start Game</button>
         </div>
       </div>
     </div>
